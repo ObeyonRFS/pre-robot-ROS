@@ -1,0 +1,48 @@
+Running (doing SLAM (no nav))
+
+===
+RPI 5
+
+ros2 launch rplidar_ros rplidar_a1_launch.py serial_port:=/dev/ttyUSB1 frame_id:=laser
+ros2 run pre_robot_robot_pc middleware_to_esp32
+
+===
+PC Ubuntu
+
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link 
+ros2 run tf2_ros static_transform_publisher 0.03 0 0.24 0 0 0 base_link laser
+
+base_footprint <- base_link <- laser
+
+#This is temporary solution for slam_toolbox is not doing mapping without odometry
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 odom base_footprint
+
+odom <- base_footprint <- base_link <- laser
+map <- odom <- base_footprint <- base_link <- laser
+
+base_link is robot body frame
+base_footprint is where robot touches the ground
+laser is laser frame
+odom is odometry frame (its relative position to map frame will be updated by slam_toolbox)
+slam_toolbox will publish map frame
+
+The odometry node that integrates velocity to calculate position will update to
+odom <- base_footprint transform
+
+note: slam_toolbox only update map <- odom transform, meaning absolute position of base_footprint is not updated
+but its relative position to odom frame is updated (because odom frame is moved)
+
+
+
+
+
+ros2 launch slam_toolbox online_async_launch.py odom_frame:=odom map_frame:=map scan_topic:=/scan base_frame:=base_footprint
+
+
+
+Rviz2 Ubuntu
+fixed_frame : base_link
+laser scan : /scan
+map : /map
+
+===

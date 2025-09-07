@@ -42,7 +42,7 @@ MicroROS repository said it themselves, that they are not ready for production
 The way to handle is
 Create extra node
 
-## Ubuntu can't access to rpliadr (permission denied)
+## Ubuntu can't access to rplidar (permission denied)
 
 Try
 ```
@@ -54,3 +54,8 @@ Or
 ```
 sudo chmod 0666 /dev/ttyUSB0
 ```
+
+## colcon build skips rplidar_ros package
+
+This is a weird bug, Try remove rplidar_ros folder in src, then clone it from official (follow slamtec instruction)
+Then colcon build again
