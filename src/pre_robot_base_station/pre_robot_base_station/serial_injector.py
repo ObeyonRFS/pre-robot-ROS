@@ -1,37 +1,43 @@
 import rclpy
 from rclpy.node import Node
-
 from std_msgs.msg import String
+import threading
 
 
-class MinimalPublisher(Node):
+class SerialPublisher(Node):
 
     def __init__(self):
-        super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        super().__init__('serial_injector_publisher')
+        self.publisher_ = self.create_publisher(String, 'pre_robot/serial/inject', 10)
         self.i = 0
 
-    def timer_callback(self):
+    def publish_text(self, text: str):
         msg = String()
-        msg.data = 'Hello World: %d' % self.i
+        msg.data = text
         self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
+        self.get_logger().info(f'Publishing user input: "{msg.data}"')
+
+
+def input_loop(node: SerialPublisher):
+    while rclpy.ok():   # keeps running until ROS shutdown
+        text = input("Enter message: ")
+        if text.strip().lower() == "quit":
+            rclpy.shutdown()
+            break
+        node.publish_text(text)
 
 
 def main(args=None):
     rclpy.init(args=args)
+    node = SerialPublisher()
 
-    minimal_publisher = MinimalPublisher()
+    # Start input thread
+    threading.Thread(target=input_loop, args=(node,), daemon=True).start()
 
-    rclpy.spin(minimal_publisher)
+    # ROS spinning in main thread
+    rclpy.spin(node)
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    minimal_publisher.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 
