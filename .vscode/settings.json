@@ -1,3 +1,15 @@
 {
-    "idf.pythonInstallPath": "/usr/bin/python"
+    "idf.pythonInstallPath": "/usr/bin/python",
+    "python.autoComplete.extraPaths": [
+        "/home/yanot/Desktop/pre-robot-ROS/install/pre_robot_robot_pc/lib/python3.12/site-packages",
+        "/home/yanot/Desktop/pre-robot-ROS/install/pre_robot_base_station/lib/python3.12/site-packages",
+        "/home/yanot/Desktop/pre-robot-ROS/station (Ubuntu PC)/install/stationary_pc/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/yanot/Desktop/pre-robot-ROS/install/pre_robot_robot_pc/lib/python3.12/site-packages",
+        "/home/yanot/Desktop/pre-robot-ROS/install/pre_robot_base_station/lib/python3.12/site-packages",
+        "/home/yanot/Desktop/pre-robot-ROS/station (Ubuntu PC)/install/stationary_pc/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ]
 }

@@ -1,4 +1,7 @@
-#ROS
+#vscode
+.vscode/
+
+#ROS build
 install/
 log/
 
