@@ -41,3 +41,16 @@ MicroROS repository said it themselves, that they are not ready for production
 
 The way to handle is
 Create extra node
+
+## Ubuntu can't access to rpliadr (permission denied)
+
+Try
+```
+sudo usermod -aG dialout $USER
+```
+Then restart ubuntu
+
+Or
+```
+sudo chmod 0666 /dev/ttyUSB0
+```

@@ -1,6 +1,6 @@
 from rplidar import RPLidar
 
-PORT_NAME = '/dev/ttyUSB1'  # your lidar port
+PORT_NAME = '/dev/ttyUSB0'  # your lidar port
 
 def main():
     lidar = RPLidar(PORT_NAME)
