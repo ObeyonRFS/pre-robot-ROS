@@ -3,7 +3,9 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 import serial
-import ports_finder
+
+#this script must be shipped in setup.py too...sadly
+# import ports_finder
 
 
 class MiddlewareNode(Node):
