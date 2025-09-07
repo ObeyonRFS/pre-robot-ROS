@@ -1,0 +1,23 @@
+{"command":"set_motor_power","parameters":{"L":0,"R":0}}
+
+{"command":"set_motor_power","parameters":{"L":-200,"R":-200}}
+
+{"command":"set_motor_speed","parameters":{"L":-24,"R":24}}
+
+{"command":"set_motor_speed","parameters":{"L":37,"R":37}}
+
+{"command":"set_motor_speed","parameters":{"L":-24,"R":-24}}
+
+{"command":"set_motor_speed","parameters":{"L":0,"R":0}}
+
+
+
+
+
+
+{"command":"set_motor_PID","parameters":{"Kp":50,"Ki":2, "Kd":2}}
+
+//was good enough
+{"command":"set_motor_PID","parameters":{"Kp":20,"Ki":3, "Kd":3}}
+
+{"command":"set_motor_PID","parameters":{"Kp":0,"Ki":0, "Kd":0}}

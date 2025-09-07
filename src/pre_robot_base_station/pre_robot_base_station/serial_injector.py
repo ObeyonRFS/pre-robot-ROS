@@ -15,7 +15,6 @@ class SerialPublisher(Node):
         msg = String()
         msg.data = text
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Publishing user input: "{msg.data}"')
 
 
 def input_loop(node: SerialPublisher):
@@ -25,6 +24,7 @@ def input_loop(node: SerialPublisher):
             rclpy.shutdown()
             break
         node.publish_text(text)
+        node.get_logger().info(f'Publishing user input: "{msg.data}"')
 
 
 def main(args=None):

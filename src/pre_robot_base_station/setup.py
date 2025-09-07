@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'serial_injector = pre_robot_base_station.serial_injector:main',
+            'robot_controller_getch = pre_robot_base_station.robot_controller_getch:main',
         ],
     },
 )
