@@ -1,70 +1,117 @@
 #include "motor_library.h"
-#include <ArduinoJson.h>
+#include "serial_comm_library.h"
 
 // Define LED pin
 #define LED_PIN 2   // On-board LED is usually GPIO2
 
-
-
-void processJson(String &jsonString){
-  StaticJsonDocument<1024> doc;
-  DeserializationError error = deserializeJson(doc, jsonString);
-
-  if(error){
-    Serial.print("JSON parse failed: ");
-    Serial.println(error.c_str());
-    return;
-  }
-
-  const char* command = doc["command"];
-  if (strcmp(command, "set_motor_power")==0){
-    motor_with_PID = false;
-    int L=doc["parameters"]["L"];
-    int R=doc["parameters"]["R"];
-    setMotorPower(L,R);
-
-    Serial.printf("Motor's power set -> L:%d  R:%d\n", L, R);
-  }
-
-  if (strcmp(command, "set_motor_speed")==0){
-    motor_with_PID = true;
-    target_motorRPM_L=doc["parameters"]["L"];
-    target_motorRPM_R=doc["parameters"]["R"];
-    Serial.printf("Motor's target speed set -> L:%.2f RPM  R:%.2f RPM\n", target_motorRPM_L, target_motorRPM_R);
-  }
-
-  if (strcmp(command, "set_motor_PID")==0){
-    motor_with_PID = false;
-    Kp=doc["parameters"]["Kp"];
-    Ki=doc["parameters"]["Ki"];
-    Kd=doc["parameters"]["Kd"];
-
-    prev_error_L = 0;
-    integral_L = 0;
-    prev_error_R = 0;
-    integral_R = 0;
-    setMotorPower(0,0);
-    Serial.printf("Motor's PID set -> Kp:%.2f  Ki:%.2f Kd:%.2f\n", Kp, Ki, Kd);
+/*
+middleware -> esp32
+{
+  "command": "set_motor_power",
+  "parameters": {
+    "L":int(0-255)
+    "R":int(0-255)
   }
 }
 
-void task_process_serial(void *pvParameters){
+{
+  "command": "set_motor_PID",
+  "parameters": {
+    "Kp":float,
+    "Ki":float,
+    "Kd":float
+  }
+}
+
+//24 is rpm limit of the motor
+{
+  "command": "set_motor_rpm",
+  "parameters": {
+    "L":float(0-24),
+    "R":float(0-24),
+  }
+}
+
+esp32 -> middleware
+{
+  "feedback_type": "motor_rpm",
+  "data":{
+    "L":float
+    "R":float
+  }
+}
+
+{
+  "feedback_type": "debug_msg",
+  "data":{
+    "msg":str
+  }
+}
+*/
+
+void process_received_json_to_control(String& jsonString){
+  StaticJsonDocument<1024> doc;
+  DeserializationError error = deserializeJson(doc, jsonString);
+  if(error){
+    String error_str="JSON parse failed: ";
+    error_str+=error.c_str();
+    send_serial_debug_msg_feedback(error_str);
+  }
+  
+  const char* command = doc["command"];
+  if(strcmp(command, "set_motor_power")==0){
+    int L=doc["parameters"]["L"];
+    int R=doc["parameters"]["R"];
+    setMotorPower(L, R);
+    send_serial_debug_msg_feedback("Motor power updated");
+  }
+  else if(strcmp(command, "set_motor_PID")==0){
+    float new_Kp = doc["parameters"]["Kp"];
+    float new_Ki = doc["parameters"]["Ki"];
+    float new_Kd = doc["paramteres"]["Kd"];
+    setMotorPID(new_Kp,new_Ki,new_Kd);
+    send_serial_debug_msg_feedback("Motor PID updated");
+  }
+  else if(strcmp(command, "set_motor_rpm")==0){
+    float L=doc["parameters"]["L"];
+    float R=doc["parameters"]["R"];
+
+    setMotorRPM(L,R);
+    send_serial_debug_msg_feedback("Motor RPM updated");
+  }
+  else{
+    send_serial_debug_msg_feedback("Unknown command detected");
+  }
+}
+
+
+TaskHandle_t task_receive_serial_handle = NULL;
+
+void task_receive_serial(void *pvParameters){
   while(true){
     static String input="";
     while(Serial.available()){
       char c=(char)Serial.read();
-      if (c=='\n'){
-        processJson(input);
-        input="";
+      if(c=='\n'){
+        process_received_json_to_control(input);
       }else{
         input+=c;
       }
     }
   }
-  
 }
 
 
+void setup_serial_comm_and_control(){
+  xTaskCreate(
+    task_receive_serial,
+    "task_receive_serial function runner",
+    4096,
+    NULL,
+    1,
+    &task_receive_serial_handle
+  );
+}
 
 
 void setup() {
@@ -74,75 +121,10 @@ void setup() {
 
   setup_pin_for_L298N();
   setup_pin_for_motor_spd_encoding();
-
-  xTaskCreate(
-    task_process_serial,
-    "JSON from Serial processor",
-    4096,
-    NULL,
-    1,
-    NULL
-  );
+  setup_serial_comm_and_control();
 
 }
   
 void loop() {
-  //Receive command
-  // static String input="";
-  // while(Serial.available()){
-  //   char c=(char)Serial.read();
-  //   if (c=='\n'){
-  //     processJson(input);
-  //     input="";
-  //   }else{
-  //     input+=c;
-  //   }
-  // }
-
-
-  //send motor speed
-  // unsigned long currentTime = millis();
-  // unsigned long dt = currentTime - left_lastTime;
-
-  // if(dt>=100){//calculate every 100ms
-  //   //Calculate speed in rpm
-  //   long left_count;
-  //   long right_count;
-  //   noInterrupts();
-  //   left_count = left_encoder_count;
-  //   left_encoder_count=0;
-  //   right_count = right_encoder_count;
-  //   right_encoder_count=0;
-  //   interrupts();
-
-  //   left_motorRPM = (left_count/(float)PPR) * (60000.0 / dt);
-  //   right_motorRPM = (right_count/(float)PPR) * (60000.0 / dt);
-
-
-  //   Serial.print("Motor RPM: ");
-  //   Serial.print(left_motorRPM);
-  //   Serial.print(" ");
-  //   Serial.println(right_motorRPM);
-
-  //   left_lastTime = currentTime;
-  //   right_lastTime = currentTime;
-
-  // }
-
-
-  // setMotor(255,-255);
-  // delay(1500);
-  // setMotor(-255,255);
-  // delay(1500);
-
-  // setMotor(0,0);
-  // delay(5000);
-
-  // // Turn LED on
-  // digitalWrite(LED_PIN, HIGH);
-  // delay(100); // wait 1 second
-
-  // // Turn LED off
-  // digitalWrite(LED_PIN, LOW);
-  // delay(100); // wait 1 second
+  
 }

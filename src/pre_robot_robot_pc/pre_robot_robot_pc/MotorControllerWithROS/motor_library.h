@@ -1,3 +1,6 @@
+#include "serial_comm_library.h"
+
+
 // L298N config for left side motor
 #define ENB 19
 #define IN4 18
@@ -121,12 +124,33 @@ float integral_L = 0;
 float prev_error_R = 0;
 float integral_R = 0;
 
+void setMotorPID(float new_Kp, float new_Ki, float new_Kd){
+  motor_with_PID = false;
+  Kp=new_Kp;
+  Ki=new_Ki;
+  Kd=new_Kd;
+
+  prev_error_L = 0;
+  integral_L = 0;
+  prev_error_R = 0;
+  integral_R = 0;
+
+  setMotorPower(0,0);
+}
+
+void setMotorRPM(float L, float R){
+  motor_with_PID = true;
+  target_motorRPM_L=L;
+  target_motorRPM_R=R;
+}
+
+float speed_calculation_period=50;
 void task_update_motor_RPM(void *pvParameters){
   while(true){
     unsigned long currentTime = millis();
     unsigned long dt = currentTime - left_lastTime;
 
-    if(dt>=100){//calculate every 100ms
+    if(dt>=speed_calculation_period){
       //Calculate speed in rpm
       long left_count;
       long right_count;
@@ -140,8 +164,7 @@ void task_update_motor_RPM(void *pvParameters){
       left_motorRPM = (left_count/(float)PPR) * (60000.0 / dt);
       right_motorRPM = (right_count/(float)PPR) * (60000.0 / dt);
 
-
-
+      send_serial_motor_rpm_feedback(left_motorRPM, right_motorRPM);
 
       if(motor_with_PID==true){
         float error_L = target_motorRPM_L - left_motorRPM;
@@ -162,17 +185,18 @@ void task_update_motor_RPM(void *pvParameters){
         output_R = constrain(output_R, -255,255);
         setMotorPower(output_L,output_R);
 
-        Serial.printf("Target %.2f %.2f | Current %.2f %.2f | Output %d %d\n", 
-                      target_motorRPM_L, target_motorRPM_R, 
-                      left_motorRPM, right_motorRPM, 
-                      output_L, output_R);
+        // Serial.printf("Target %.2f %.2f | Current %.2f %.2f | Output %d %d\n", 
+        //               target_motorRPM_L, target_motorRPM_R, 
+        //               left_motorRPM, right_motorRPM, 
+        //               output_L, output_R);
 
-      }else{
-        Serial.print("Motor RPM: ");
-        Serial.print(left_motorRPM);
-        Serial.print(" ");
-        Serial.println(right_motorRPM);
       }
+      // else{
+      //   Serial.print("Motor RPM: ");
+      //   Serial.print(left_motorRPM);
+      //   Serial.print(" ");
+      //   Serial.println(right_motorRPM);
+      // }
 
       left_lastTime = currentTime;
       right_lastTime = currentTime;
@@ -193,7 +217,7 @@ void setup_pin_for_motor_spd_encoding(){
 
   xTaskCreate(
     task_update_motor_RPM,
-    "Motor speed publisher",
+    "task_update_motor_RPM function runner",
     4096,
     NULL,
     1,

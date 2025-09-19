@@ -45,4 +45,6 @@ fixed_frame : base_link
 laser scan : /scan
 map : /map
 
+ros2 run pre_robot_base_station robot_controller_getch
+
 ===
