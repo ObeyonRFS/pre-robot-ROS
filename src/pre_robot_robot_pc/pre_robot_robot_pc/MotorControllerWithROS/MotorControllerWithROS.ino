@@ -50,32 +50,33 @@ esp32 -> middleware
 */
 
 void process_received_json_to_control(String& jsonString){
-  StaticJsonDocument<1024> doc_recv;
-  DeserializationError error = deserializeJson(doc_recv, jsonString);
+  StaticJsonDocument<1024> doc;
+  doc.clear();
+  DeserializationError error = deserializeJson(doc, jsonString);
   if(error){
     String error_str="JSON parse failed: ";
     error_str+=error.c_str();
     send_serial_debug_msg_feedback(error_str);
   }
   
-  const char* command = doc_recv["command"];
-  send_serial_debug_msg_feedback(doc_recv["command"]);
+  const char* command = doc["command"];
+  send_serial_debug_msg_feedback(doc["command"]);
   if(strcmp(command, "set_motor_power")==0){
-    int L=doc_recv["parameters"]["L"];
-    int R=doc_recv["parameters"]["R"];
+    int L=doc["parameters"]["L"];
+    int R=doc["parameters"]["R"];
     setMotorPower(L, R);
     send_serial_debug_msg_feedback("Motor power updated");
   }
   else if(strcmp(command, "set_motor_PID")==0){
-    float new_Kp = doc_recv["parameters"]["Kp"];
-    float new_Ki = doc_recv["parameters"]["Ki"];
-    float new_Kd = doc_recv["paramteres"]["Kd"];
+    float new_Kp = doc["parameters"]["Kp"];
+    float new_Ki = doc["parameters"]["Ki"];
+    float new_Kd = doc["paramteres"]["Kd"];
     setMotorPID(new_Kp,new_Ki,new_Kd);
     send_serial_debug_msg_feedback("Motor PID updated");
   }
   else if(strcmp(command, "set_motor_rpm")==0){
-    float L=doc_recv["parameters"]["L"];
-    float R=doc_recv["parameters"]["R"];
+    float L=doc["parameters"]["L"];
+    float R=doc["parameters"]["R"];
 
     setMotorRPM(L,R);
     send_serial_debug_msg_feedback("Motor RPM updated");
