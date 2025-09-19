@@ -1,4 +1,4 @@
-pyserial-asyncio:
+python3-serial-asyncio:
   ubuntu:
     pip:
       packages: [pyserial-asyncio]
