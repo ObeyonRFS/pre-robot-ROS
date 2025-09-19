@@ -1,6 +1,6 @@
 {"command":"set_motor_power","parameters":{"L":0,"R":0}}
 
-{"command":"set_motor_power","parameters":{"L":-200,"R":-200}}
+{"command":"set_motor_power","parameters":{"L":-255,"R":-255}}
 
 {"command":"set_motor_speed","parameters":{"L":-24,"R":24}}
 

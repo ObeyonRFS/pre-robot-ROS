@@ -59,6 +59,7 @@ void process_received_json_to_control(String& jsonString){
   }
   
   const char* command = doc["command"];
+  send_serial_debug_msg_feedback(doc["command"]);
   if(strcmp(command, "set_motor_power")==0){
     int L=doc["parameters"]["L"];
     int R=doc["parameters"]["R"];
