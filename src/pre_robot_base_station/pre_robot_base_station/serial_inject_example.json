@@ -2,13 +2,13 @@
 
 {"command":"set_motor_power","parameters":{"L":-255,"R":-255}}
 
-{"command":"set_motor_speed","parameters":{"L":-24,"R":24}}
+{"command":"set_motor_rpm","parameters":{"L":24,"R":24}}
 
-{"command":"set_motor_speed","parameters":{"L":37,"R":37}}
+{"command":"set_motor_rpm","parameters":{"L":-32,"R":-32}}
 
-{"command":"set_motor_speed","parameters":{"L":-24,"R":-24}}
+{"command":"set_motor_rpm","parameters":{"L":24,"R":24}}
 
-{"command":"set_motor_speed","parameters":{"L":0,"R":0}}
+{"command":"set_motor_rpm","parameters":{"L":0,"R":0}}
 
 
 

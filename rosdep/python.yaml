@@ -1,0 +1,4 @@
+pyserial-asyncio:
+  ubuntu:
+    pip:
+      packages: [pyserial-asyncio]

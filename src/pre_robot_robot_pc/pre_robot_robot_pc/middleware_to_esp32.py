@@ -1,9 +1,13 @@
+import json
 import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import serial
+
+import asyncio, serial_asyncio, json
+
 
 #this script must be shipped in setup.py too...sadly
 # import ports_finder
@@ -40,17 +44,26 @@ class MiddlewareNode(Node):
             self.get_logger().error(f'Error opening/writing to serial port: {e}')
 
 
+async def serial_reader(node: MiddlewareNode):
+    reader, writer = await serial_asyncio.open_serial_connection(url='/dev/ttyUSB0', baudrate=115200)
+    while True:
+        line = await reader.readline()
+        try:
+            data=json.loads(line.decode('utf-8').strip())
+            
+
+
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MiddlewareNode()
+    node = MiddlewareNode()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(node)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 

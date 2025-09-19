@@ -144,7 +144,7 @@ void setMotorRPM(float L, float R){
   target_motorRPM_R=R;
 }
 
-float speed_calculation_period=50;
+float speed_calculation_period=50;//read speed 50ms periodically
 void task_update_motor_RPM(void *pvParameters){
   while(true){
     unsigned long currentTime = millis();
