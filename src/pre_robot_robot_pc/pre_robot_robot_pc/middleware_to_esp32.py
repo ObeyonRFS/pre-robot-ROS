@@ -8,7 +8,18 @@ from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import serial
-from tf_transformations import quaternion_from_euler  # available in ROS tf-transformations
+# from tf_transformations import quaternion_from_euler  # available in ROS tf-transformations
+
+
+import math
+
+def quaternion_from_euler(roll, pitch, yaw):
+    qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
+    qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
+    qz = math.cos(roll/2) * math.cos(pitch/2) * math.sin(yaw/2) - math.sin(roll/2) * math.sin(pitch/2) * math.cos(yaw/2)
+    qw = math.cos(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
+    return (qx, qy, qz, qw)
+
 
 
 class MiddlewareNode(Node):
