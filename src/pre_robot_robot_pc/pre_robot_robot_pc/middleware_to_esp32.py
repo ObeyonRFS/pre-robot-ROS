@@ -92,7 +92,6 @@ class MiddlewareNode(Node):
     def process_motor_feedback(self, rpm_data):
         rpm_L = rpm_data.get('L', 0.0)
         rpm_R = rpm_data.get('R', 0.0)
-        self.get_logger().debug(rpm_L,rpm_R)
 
         now = time.time()
         dt = now - self.last_time
