@@ -52,6 +52,7 @@ class MiddlewareNode(Node):
                 if not line:
                     continue
                 data=json.loads(line)
+                self.get_logger().info(f'Received from ESP32: {data}')
             except Exception as e:
                 print(e)
                 continue

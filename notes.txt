@@ -3,19 +3,19 @@ Running (doing SLAM (no nav))
 ===
 RPI 5
 
-ros2 launch rplidar_ros rplidar_a1_launch.py serial_port:=/dev/ttyUSB1 frame_id:=laser
-ros2 run pre_robot_robot_pc middleware_to_esp32
+$ ros2 launch rplidar_ros rplidar_a1_launch.py serial_port:=/dev/ttyUSB1 frame_id:=laser
+$ ros2 run pre_robot_robot_pc middleware_to_esp32
 
 ===
 PC Ubuntu
 
-ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link 
-ros2 run tf2_ros static_transform_publisher 0.03 0 0.24 0 0 0 base_link laser
+$ ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link 
+$ ros2 run tf2_ros static_transform_publisher 0.03 0 0.24 0 0 0 base_link laser
 
 base_footprint <- base_link <- laser
 
 #This is temporary solution for slam_toolbox is not doing mapping without odometry
-ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 odom base_footprint
+$ ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 odom base_footprint
 
 odom <- base_footprint <- base_link <- laser
 map <- odom <- base_footprint <- base_link <- laser
@@ -36,7 +36,7 @@ but its relative position to odom frame is updated (because odom frame is moved)
 
 
 
-ros2 launch slam_toolbox online_async_launch.py odom_frame:=odom map_frame:=map scan_topic:=/scan base_frame:=base_footprint
+$ ros2 launch slam_toolbox online_async_launch.py odom_frame:=odom map_frame:=map scan_topic:=/scan base_frame:=base_footprint
 
 
 
