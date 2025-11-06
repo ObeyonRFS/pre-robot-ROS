@@ -38,7 +38,7 @@ def input_loop(node: RobotControllerGetch):
     while rclpy.ok():
         key = getch()
         message={
-            "command": "set_motor_speed",
+            "command": "set_motor_rpm",
             "parameters": {
                 "L": 0,
                 "R": 0,
