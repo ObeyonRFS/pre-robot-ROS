@@ -2,3 +2,9 @@ python3-serial-asyncio:
   ubuntu:
     pip:
       packages: [pyserial-asyncio]
+
+
+tf-transformations:
+  ubuntu:
+    pip:
+      packages: [tf-transformations]
