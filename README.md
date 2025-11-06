@@ -59,3 +59,26 @@ sudo chmod 0666 /dev/ttyUSB0
 
 This is a weird bug, Try remove rplidar_ros folder in src, then clone it from official (follow slamtec instruction)
 Then colcon build again
+
+## "This power supply is not capable of supplying 5A; power to peripherals will be restricted" notification on RPi
+### 1st solution
+perform a configuration on RPi
+```
+$ vcgencmd get_config usb_max_current_enable
+```
+
+if result is `usb_max_current_enable=0`
+
+then run
+```
+$ sudo nano /boot/firmware/config.txt
+```
+then add `usb_max_current_enable=1` to at the end of file
+
+then run
+```
+$ sudo rpi-eeprom-config --edit
+```
+then add `PSU_MAX_CURRENT=7000`, 7000 is milliamps value that your power supply can give, change it to value you desire for RPi to draw
+
+### 2nd solution

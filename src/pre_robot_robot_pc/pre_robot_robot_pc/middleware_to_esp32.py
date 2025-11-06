@@ -1,12 +1,11 @@
 import json
+import threading
 import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import serial
-
-import asyncio, serial_asyncio, json
 
 
 #this script must be shipped in setup.py too...sadly
@@ -29,8 +28,11 @@ class MiddlewareNode(Node):
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
-        self.odom_pub = self.create_publisher(Odometry, 'pre_robot/odom', 10)
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        # self.odom_pub = self.create_publisher(Odometry, 'pre_robot/odom', 10)
+        # self.timer = self.create_timer(0.1, self.timer_callback)
+
+        self.read_serial_thread = threading.Thread(target=self.read_serial, daemon=True)
+        self.read_serial_thread.start()
         
 
     def listener_callback(self, msg):
@@ -43,13 +45,44 @@ class MiddlewareNode(Node):
         except serial.SerialException as e:
             self.get_logger().error(f'Error opening/writing to serial port: {e}')
 
-
-async def serial_reader(node: MiddlewareNode):
-    reader, writer = await serial_asyncio.open_serial_connection(url='/dev/ttyUSB0', baudrate=115200)
-    while True:
-        line = await reader.readline()
-        try:
-            data=json.loads(line.decode('utf-8').strip())
+    def read_serial(self):
+        while rclpy.ok():
+            try:
+                line = self.ser.readline().decode('utf-8').strip()
+                if not line:
+                    continue
+                data=json.loads(line)
+            except Exception as e:
+                print(e)
+                continue
+            # try:
+            #     if self.esp32_serial.in_waiting > 0:
+            #         line = self.esp32_serial.readline().decode('utf-8').rstrip()
+            #         if line:
+            #             self.get_logger().info(f'Received from ESP32: "{line}"')
+            #             # Process the received line (assuming it's JSON formatted for Odometry)
+            #             try:
+            #                 data = json.loads(line)
+            #                 odom_msg = Odometry()
+            #                 # Fill in the odom_msg fields based on the received data
+            #                 # This is a placeholder; actual implementation depends on the data format
+            #                 odom_msg.header.stamp = self.get_clock().now().to_msg()
+            #                 odom_msg.header.frame_id = "odom"
+            #                 odom_msg.child_frame_id = "base_link"
+            #                 odom_msg.pose.pose.position.x = data.get('x', 0.0)
+            #                 odom_msg.pose.pose.position.y = data.get('y', 0.0)
+            #                 odom_msg.pose.pose.position.z = data.get('z', 0.0)
+            #                 odom_msg.pose.pose.orientation.x = data.get('qx', 0.0)
+            #                 odom_msg.pose.pose.orientation.y = data.get('qy', 0.0)
+            #                 odom_msg.pose.pose.orientation.z = data.get('qz', 0.0)
+            #                 odom_msg.pose.pose.orientation.w = data.get('qw', 1.0)
+            #                 # Publish the Odometry message
+            #                 # self.odom_pub.publish(odom_msg)
+            #             except json.JSONDecodeError:
+            #                 self.get_logger().error(f'Failed to decode JSON from ESP32: "{line}"')
+            # except serial.SerialException as e:
+            #     self.get_logger().error(f'Serial communication error: {e}')
+            #     break
             
 
 

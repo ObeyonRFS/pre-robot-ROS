@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'pyserial', 'pyserial-asyncio'],
+    install_requires=['setuptools', 'pyserial'],
     zip_safe=True,
     maintainer='yanot',
     maintainer_email='yanothaic15@gmail.com',
