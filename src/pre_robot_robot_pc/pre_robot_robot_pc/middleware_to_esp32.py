@@ -117,7 +117,7 @@ class MiddlewareNode(Node):
 
         # Compute linear and angular velocity
         v = (v_R + v_L) / 2.0
-        omega = (v_R - v_L) / self.wheel_base
+        omega = (v_R - v_L) / (self.wheel_base*2)
 
         # Integrate position
         self.x += v * math.cos(self.theta) * dt
