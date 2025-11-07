@@ -27,8 +27,8 @@ class MiddlewareNode(Node):
         super().__init__('middleware_serial_communicator')
 
         # --- Robot constants ---
-        self.wheel_radius = (68.55/100)/2 #diameter(m)/2
-        self.wheel_base = (35.8/100) #distance between wheels
+        self.wheel_radius = (68.55/100/100)/2 #diameter(mm->cm->m)/2
+        self.wheel_base = (35.8/100) #distance between wheels (cm->m)
 
         # --- State variables ---
         self.x = 0.0
@@ -117,7 +117,7 @@ class MiddlewareNode(Node):
 
         # Compute linear and angular velocity
         v = (v_R + v_L) / 2.0
-        omega = (v_R - v_L) / (self.wheel_base*2)
+        omega = (v_R - v_L) / (self.wheel_base)
 
         # Integrate position
         self.x += v * math.cos(self.theta) * dt
