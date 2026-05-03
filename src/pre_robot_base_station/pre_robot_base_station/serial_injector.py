@@ -24,7 +24,7 @@ def input_loop(node: SerialPublisher):
             rclpy.shutdown()
             break
         node.publish_text(text)
-        node.get_logger().info(f'Publishing user input: "{msg.data}"')
+        node.get_logger().info(f'Publishing user input: "{text}"')
 
 
 def main(args=None):

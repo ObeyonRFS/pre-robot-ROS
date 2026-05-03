@@ -9,6 +9,8 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 import serial
 # from tf_transformations import quaternion_from_euler  # available in ROS tf-transformations
+from tf2_ros import TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
 
 
 import math
@@ -45,22 +47,30 @@ class MiddlewareNode(Node):
             self.esp32_serial = None
 
         # --- ROS setup ---
-        self.subscription = self.create_subscription(
+        self.serial_injection_subscription = self.create_subscription(
             String,
             'pre_robot/serial/inject',
-            self.listener_callback,
+            self.serial_injection_listener_callback,
             10
         )
-        self.odom_pub = self.create_publisher(Odometry, 'pre_robot/odom', 10)
+        self.odom_wheel_pub = self.create_publisher(Odometry, 'pre_robot/odom_with_wheel', 10)
+        # self.set_robot_vel_subscription = self.create_subscription(
+        #     String,
+        #     'pre_robot/set_robot_vel',
+        #     self.set_robot_vel_callback,
+        #     10
+        # )
 
         # --- Serial reading thread ---
         self.read_serial_thread = threading.Thread(target=self.read_serial, daemon=True)
         self.read_serial_thread.start()
 
+        self.tf_broadcaster = TransformBroadcaster(self)
+
     # ----------------------------------------------------------
     # ROS2 -> ESP32
     # ----------------------------------------------------------
-    def listener_callback(self, msg):
+    def serial_injection_listener_callback(self, msg):
         if not self.esp32_serial or not self.esp32_serial.is_open:
             self.get_logger().error('Serial port not available.')
             return
@@ -70,12 +80,14 @@ class MiddlewareNode(Node):
             self.get_logger().info(f'Sent to ESP32: "{msg.data}"')
         except serial.SerialException as e:
             self.get_logger().error(f'Failed to write to serial: {e}')
+    
 
     # ----------------------------------------------------------
     # ESP32 -> ROS2
     # ----------------------------------------------------------
     def read_serial(self):
         if not self.esp32_serial:
+
             return
 
         while rclpy.ok():
@@ -96,6 +108,26 @@ class MiddlewareNode(Node):
             except Exception as e:
                 self.get_logger().error(f'Serial read error: {e}')
                 continue
+
+
+    def broadcast_tf(self):
+        t = TransformStamped()
+
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "odom"
+        t.child_frame_id = "base_link"
+
+        t.transform.translation.x = self.x
+        t.transform.translation.y = self.y
+        t.transform.translation.z = 0.0
+
+        q = quaternion_from_euler(0, 0, self.theta)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+
+        self.tf_broadcaster.sendTransform(t)
 
     # ----------------------------------------------------------
     # Process motor feedback and publish odometry
@@ -148,7 +180,8 @@ class MiddlewareNode(Node):
         odom_msg.twist.twist.linear.x = v
         odom_msg.twist.twist.angular.z = omega
 
-        self.odom_pub.publish(odom_msg)
+        self.odom_wheel_pub.publish(odom_msg)
+        self.broadcast_tf()
 
     def destroy_node(self):
         if self.esp32_serial and self.esp32_serial.is_open:

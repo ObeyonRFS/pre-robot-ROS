@@ -1,3 +1,10 @@
+View robot position in rviz
+
+
+
+
+
+
 Running (doing SLAM (no nav))
 
 ===
