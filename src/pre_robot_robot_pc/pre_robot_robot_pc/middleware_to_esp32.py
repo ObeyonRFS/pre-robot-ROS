@@ -150,7 +150,9 @@ class MiddlewareNode(Node):
 
         # Compute linear and angular velocity
         v = (v_R + v_L) / 2.0
-        omega = (v_R - v_L) / (self.distance_wheel_to_base)
+        # omega = (v_R - v_L) / (self.distance_wheel_to_base)
+        # Don't know, in rviz have rotation problem
+        omega = (v_R - v_L) / (self.distance_wheel_to_base) * 4
 
         # Integrate position
         self.x += v * math.cos(self.theta) * dt
