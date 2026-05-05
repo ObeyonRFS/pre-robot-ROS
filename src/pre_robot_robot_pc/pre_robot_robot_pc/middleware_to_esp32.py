@@ -30,7 +30,8 @@ class MiddlewareNode(Node):
 
         # --- Robot constants ---
         self.wheel_radius = (68.55/100/100)/2 #diameter(mm->cm->m)/2
-        self.wheel_base = (35.8/100) #distance between wheels (cm->m)
+        self.distance_between_wheels = (17.3*2/100) #distance between wheels (cm->m)
+        self.distance_wheel_to_base = self.distance_between_wheels/2
 
         # --- State variables ---
         self.x = 0.0
@@ -149,7 +150,7 @@ class MiddlewareNode(Node):
 
         # Compute linear and angular velocity
         v = (v_R + v_L) / 2.0
-        omega = (v_R - v_L) / (self.wheel_base)
+        omega = (v_R - v_L) / (self.distance_wheel_to_base)
 
         # Integrate position
         self.x += v * math.cos(self.theta) * dt
