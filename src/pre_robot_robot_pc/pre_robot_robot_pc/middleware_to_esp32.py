@@ -29,7 +29,7 @@ class MiddlewareNode(Node):
         super().__init__('middleware_serial_communicator')
 
         # --- Robot constants ---
-        self.wheel_radius = (68.55/100/100)/2 #diameter(mm->cm->m)/2
+        self.wheel_radius = (68.55/10/100)/2 #diameter(mm->cm->m)/2
         self.distance_between_wheels = (17.3*2/100) #distance between wheels (cm->m)
         self.distance_wheel_to_base = self.distance_between_wheels/2
 
@@ -54,7 +54,9 @@ class MiddlewareNode(Node):
             self.serial_injection_listener_callback,
             10
         )
+        #ros2 topic echo /pre_robot/odom_with_wheel
         self.odom_wheel_pub = self.create_publisher(Odometry, 'pre_robot/odom_with_wheel', 10)
+        #ros2 topic pub /pre_robot/reset_odom std_msgs/msg/String "{}" -1
         self.reset_odom_value_sub = self.create_subscription(
             String,
             'pre_robot/reset_odom',
