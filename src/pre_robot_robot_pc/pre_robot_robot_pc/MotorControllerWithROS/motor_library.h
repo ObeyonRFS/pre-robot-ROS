@@ -67,7 +67,8 @@ void setup_pin_for_L298N() {
 //Motor speed reading involve
 
 
-const int PPR = 2950;
+const int PPR = 270*11; //gear ratio * PPR at attached shalf
+//I typed 2950
 
 #define LEFT_C1 13
 #define LEFT_C2 12
