@@ -48,22 +48,6 @@ def input_loop(node: RobotControllerGetch):
             if key == 'q':
                 rclpy.shutdown()
                 break
-            # if key == 'a':
-            #     message["parameters"]["L"] = -18
-            #     message["parameters"]["R"] = 18
-            # if key == 'd':
-            #     message["parameters"]["L"] = 18
-            #     message["parameters"]["R"] = -18
-            # if key == 'w':
-            #     message["parameters"]["L"] = 24
-            #     message["parameters"]["R"] = 24
-            # if key == 's':
-            #     message["parameters"]["L"] = -24
-            #     message["parameters"]["R"] = -24
-            # if key == ' ':
-            #     message["parameters"]["L"] = 0
-            #     message["parameters"]["R"] = 0
-
             if key == 'a':
                 message["parameters"]["L"] = -18
                 message["parameters"]["R"] = 18
@@ -71,11 +55,11 @@ def input_loop(node: RobotControllerGetch):
                 message["parameters"]["L"] = 18
                 message["parameters"]["R"] = -18
             if key == 'w':
-                message["parameters"]["L"] = 32
-                message["parameters"]["R"] = 32
+                message["parameters"]["L"] = 24
+                message["parameters"]["R"] = 24
             if key == 's':
-                message["parameters"]["L"] = -32
-                message["parameters"]["R"] = -32
+                message["parameters"]["L"] = -24
+                message["parameters"]["R"] = -24
             if key == ' ':
                 message["parameters"]["L"] = 0
                 message["parameters"]["R"] = 0

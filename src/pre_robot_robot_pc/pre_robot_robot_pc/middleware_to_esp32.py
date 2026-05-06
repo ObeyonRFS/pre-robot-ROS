@@ -55,6 +55,12 @@ class MiddlewareNode(Node):
             10
         )
         self.odom_wheel_pub = self.create_publisher(Odometry, 'pre_robot/odom_with_wheel', 10)
+        self.reset_odom_value = self.create_subscription(
+            String,
+            'pre_robot/reset_odom',
+            self.reset_odom_callback,
+            10
+        )
         # self.set_robot_vel_subscription = self.create_subscription(
         #     String,
         #     'pre_robot/set_robot_vel',
