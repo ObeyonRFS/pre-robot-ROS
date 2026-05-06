@@ -55,7 +55,7 @@ class MiddlewareNode(Node):
             10
         )
         self.odom_wheel_pub = self.create_publisher(Odometry, 'pre_robot/odom_with_wheel', 10)
-        self.reset_odom_value = self.create_subscription(
+        self.reset_odom_value_sub = self.create_subscription(
             String,
             'pre_robot/reset_odom',
             self.reset_odom_callback,
@@ -193,6 +193,13 @@ class MiddlewareNode(Node):
 
         self.odom_wheel_pub.publish(odom_msg)
         self.broadcast_tf()
+
+
+    def reset_odom_callback(self, msg):
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
+        self.get_logger().info('Odometry reset.')
 
     def destroy_node(self):
         if self.esp32_serial and self.esp32_serial.is_open:
