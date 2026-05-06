@@ -152,7 +152,9 @@ class MiddlewareNode(Node):
         v = (v_R + v_L) / 2.0
         # omega = (v_R - v_L) / (self.distance_wheel_to_base)
         # Don't know, in rviz have rotation problem
-        omega = (v_R - v_L) / (self.distance_wheel_to_base) * (4+4/3)
+        # omega = (v_R - v_L) / (self.distance_wheel_to_base) * (4+4/3)
+        omega = (v_R - v_L) / self.distance_between_wheels
+
 
         # Integrate position
         self.x += v * math.cos(self.theta) * dt
