@@ -88,8 +88,8 @@ class MiddlewareNode(Node):
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = "base_footprint"
         t.child_frame_id = "base_link"
-        t.transform.translation.x = self.x+9.7/100
-        t.transform.translation.y = self.y
+        t.transform.translation.x = 9.7/100
+        t.transform.translation.y = 0.0
         t.transform.translation.z = 14/100
         q = quaternion_from_euler(0, 0, 0)
         t.transform.rotation.x = q[0]
@@ -97,6 +97,21 @@ class MiddlewareNode(Node):
         t.transform.rotation.z = q[2]
         t.transform.rotation.w = q[3]
         self.static_tf_broadcaster.sendTransform(t)
+
+        #base_link -> caster_wheel_link
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "base_link"
+        t.child_frame_id = "caster_wheel_link"
+        t.transform.translation.x = 10.5/100
+        t.transform.translation.y = 0.0
+        t.transform.translation.z = -14/100+self.wheel_radius
+        q = quaternion_from_euler(0, 0, 0)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+        self.tf_broadcaster.sendTransform(t)
 
     # ----------------------------------------------------------
     # ROS2 -> ESP32
