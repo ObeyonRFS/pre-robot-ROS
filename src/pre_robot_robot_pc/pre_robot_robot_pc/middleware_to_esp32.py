@@ -111,7 +111,7 @@ class MiddlewareNode(Node):
         t.transform.rotation.y = q[1]
         t.transform.rotation.z = q[2]
         t.transform.rotation.w = q[3]
-        self.tf_broadcaster.sendTransform(t)
+        self.static_tf_broadcaster.sendTransform(t)
 
         #base_link -> laser_link
         t = TransformStamped()
@@ -126,7 +126,7 @@ class MiddlewareNode(Node):
         t.transform.rotation.y = q[1]
         t.transform.rotation.z = q[2]
         t.transform.rotation.w = q[3]
-        self.tf_broadcaster.sendTransform(t)
+        self.static_tf_broadcaster.sendTransform(t)
 
     # ----------------------------------------------------------
     # ROS2 -> ESP32
