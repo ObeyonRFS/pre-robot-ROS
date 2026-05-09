@@ -113,6 +113,21 @@ class MiddlewareNode(Node):
         t.transform.rotation.w = q[3]
         self.tf_broadcaster.sendTransform(t)
 
+        #base_link -> laser_link
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "base_link"
+        t.child_frame_id = "laser_link"
+        t.transform.translation.x = -2.4/100
+        t.transform.translation.y = 0.0
+        t.transform.translation.z = 12.0/100
+        q = quaternion_from_euler(0, 0, 0)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+        self.tf_broadcaster.sendTransform(t)
+
     # ----------------------------------------------------------
     # ROS2 -> ESP32
     # ----------------------------------------------------------
@@ -196,21 +211,6 @@ class MiddlewareNode(Node):
         t.transform.translation.y = -self.distance_between_wheels/2
         t.transform.translation.z = -14/100+self.wheel_radius
         q = quaternion_from_euler(0, self.right_wheel_rotation, 0)
-        t.transform.rotation.x = q[0]
-        t.transform.rotation.y = q[1]
-        t.transform.rotation.z = q[2]
-        t.transform.rotation.w = q[3]
-        self.tf_broadcaster.sendTransform(t)
-
-        #base_link -> laser_link
-        t = TransformStamped()
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = "base_link"
-        t.child_frame_id = "laser_link"
-        t.transform.translation.x = -2.4/100
-        t.transform.translation.y = 0.0
-        t.transform.translation.z = 12.0/100
-        q = quaternion_from_euler(0, 0, 0)
         t.transform.rotation.x = q[0]
         t.transform.rotation.y = q[1]
         t.transform.rotation.z = q[2]
