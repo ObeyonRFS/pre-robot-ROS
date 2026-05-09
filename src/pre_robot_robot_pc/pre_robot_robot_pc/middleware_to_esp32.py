@@ -83,11 +83,12 @@ class MiddlewareNode(Node):
         self.broadcast_static_transforms()
 
     def broadcast_static_transforms(self):
+        #base_footprint -> base_link
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = "base_footprint"
         t.child_frame_id = "base_link"
-        t.transform.translation.x = self.x
+        t.transform.translation.x = self.x+9.7/100
         t.transform.translation.y = self.y
         t.transform.translation.z = 14/100
         q = quaternion_from_euler(0, 0, 0)
