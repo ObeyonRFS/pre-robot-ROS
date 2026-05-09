@@ -11,6 +11,7 @@ import serial
 # from tf_transformations import quaternion_from_euler  # available in ROS tf-transformations
 from tf2_ros import TransformBroadcaster
 from geometry_msgs.msg import TransformStamped
+from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 
 
 import math
@@ -38,6 +39,9 @@ class MiddlewareNode(Node):
         self.y = 0.0
         self.theta = 0.0
         self.last_time = time.time()
+
+        self.left_wheel_rotation = 0 #in radian
+        self.right_wheel_rotation = 0 #in radian
 
         # --- Serial setup ---
         try:
@@ -75,6 +79,23 @@ class MiddlewareNode(Node):
         self.read_serial_thread.start()
 
         self.tf_broadcaster = TransformBroadcaster(self)
+        self.static_tf_broadcaster = StaticTransformBroadcaster(self)
+        self.broadcast_static_transforms()
+
+    def broadcast_static_transforms(self):
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "base_footprint"
+        t.child_frame_id = "base_link"
+        t.transform.translation.x = self.x
+        t.transform.translation.y = self.y
+        t.transform.translation.z = 14/100
+        q = quaternion_from_euler(0, 0, 0)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+        self.static_tf_broadcaster.sendTransform(t)
 
     # ----------------------------------------------------------
     # ROS2 -> ESP32
@@ -124,7 +145,7 @@ class MiddlewareNode(Node):
 
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = "odom"
-        t.child_frame_id = "base_link"
+        t.child_frame_id = "base_footprint"
 
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
@@ -144,6 +165,9 @@ class MiddlewareNode(Node):
     def process_motor_feedback(self, rpm_data):
         rpm_L = rpm_data.get('L', 0.0)
         rpm_R = rpm_data.get('R', 0.0)
+        # Convert RPM (round per minute) to RPS (radian per second)
+        rps_L = rpm_L * (2 * math.pi / 60.0) 
+        rps_R = rpm_R * (2 * math.pi / 60.0)
 
         now = time.time()
         dt = now - self.last_time
@@ -153,8 +177,8 @@ class MiddlewareNode(Node):
             return
 
         # Convert RPM to m/s
-        v_L = 2 * math.pi * self.wheel_radius * (rpm_L / 60.0)
-        v_R = 2 * math.pi * self.wheel_radius * (rpm_R / 60.0)
+        v_L = rps_L * self.wheel_radius
+        v_R = rps_R * self.wheel_radius
 
         # Compute linear and angular velocity
         v = (v_R + v_L) / 2.0
@@ -168,6 +192,8 @@ class MiddlewareNode(Node):
         self.x += v * math.cos(self.theta) * dt
         self.y += v * math.sin(self.theta) * dt
         self.theta += omega * dt
+        self.left_wheel_rotation += rps_L * dt
+        self.right_wheel_rotation += rps_R * dt
 
         # Publish odometry
         self.publish_odometry(v, omega)
@@ -176,7 +202,7 @@ class MiddlewareNode(Node):
         odom_msg = Odometry()
         odom_msg.header.stamp = self.get_clock().now().to_msg()
         odom_msg.header.frame_id = "odom"
-        odom_msg.child_frame_id = "base_link"
+        odom_msg.child_frame_id = "base_footprint"
 
         # Position
         odom_msg.pose.pose.position.x = self.x
