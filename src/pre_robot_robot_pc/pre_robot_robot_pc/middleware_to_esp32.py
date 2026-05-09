@@ -38,7 +38,7 @@ class MiddlewareNode(Node):
         self.x = 0.0
         self.y = 0.0
         self.theta = 0.0
-        self.last_time = time.time()
+        self.last_time = self.get_clock().now().nanoseconds / 1e9
 
         self.left_wheel_rotation = 0 #in radian
         self.right_wheel_rotation = 0 #in radian
@@ -227,7 +227,7 @@ class MiddlewareNode(Node):
         rps_L = rpm_L * (2 * math.pi / 60.0) 
         rps_R = rpm_R * (2 * math.pi / 60.0)
 
-        now = time.time()
+        now = self.get_clock().now().nanoseconds / 1e9
         dt = now - self.last_time
         self.last_time = now
 
@@ -250,6 +250,7 @@ class MiddlewareNode(Node):
         self.x += v * math.cos(self.theta) * dt
         self.y += v * math.sin(self.theta) * dt
         self.theta += omega * dt
+        self.theta = math.atan2(math.sin(self.theta), math.cos(self.theta))
         self.left_wheel_rotation += rps_L * dt
         self.right_wheel_rotation += rps_R * dt
 
