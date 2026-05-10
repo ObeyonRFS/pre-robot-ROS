@@ -42,12 +42,14 @@ def input_loop(node: RobotControllerGetchCmdVel):
 
     print("WASD to move, SPACE to stop, Q to quit")
 
+    linear = 0.0
+    angular = 0.0
+
     while rclpy.ok():
 
         key = getch()
 
-        linear = 0.0
-        angular = 0.0
+        
 
         if key:
 
@@ -56,16 +58,16 @@ def input_loop(node: RobotControllerGetchCmdVel):
                 break
 
             elif key == 'w':
-                linear += 0.20
+                linear += 0.10
 
             elif key == 's':
-                linear += -0.20
+                linear += -0.10
 
             elif key == 'a':
-                angular += 1.0
+                angular += 0.05
 
             elif key == 'd':
-                angular += -1.0
+                angular += -0.05
 
             elif key == ' ':
                 linear = 0.0
