@@ -6,7 +6,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Quaternion, Twist
 import serial
 # from tf_transformations import quaternion_from_euler  # available in ROS tf-transformations
 from tf2_ros import TransformBroadcaster
@@ -73,6 +73,12 @@ class MiddlewareNode(Node):
         #     self.set_robot_vel_callback,
         #     10
         # )
+        self.cmd_vel_sub = self.create_subscription(
+            Twist,
+            '/cmd_vel',
+            self.cmd_vel_callback,
+            10
+        )
 
         # --- Serial reading thread ---
         self.read_serial_thread = threading.Thread(target=self.read_serial, daemon=True)
@@ -297,6 +303,28 @@ class MiddlewareNode(Node):
         self.y = 0.0
         self.theta = 0.0
         self.get_logger().info('Odometry reset.')
+
+    def cmd_vel_callback(self, twist_msg: Twist):
+
+        v = twist_msg.linear.x
+        omega = twist_msg.angular.z
+
+        v_L = v - (omega * self.distance_between_wheels / 2.0)
+        v_R = v + (omega * self.distance_between_wheels / 2.0)
+
+        wheel_rad_s_L = v_L / self.wheel_radius
+        wheel_rad_s_R = v_R / self.wheel_radius
+
+        rpm_L = wheel_rad_s_L * 60.0 / (2 * math.pi)
+        rpm_R = wheel_rad_s_R * 60.0 / (2 * math.pi)
+
+        self.esp32_serial.write((json.dumps({
+            "command": "set_motor_rpm",
+            "parameters": {
+                "L": rpm_L,
+                "R": rpm_R,
+            }
+        }) + '\n').encode('utf-8'))
 
     def destroy_node(self):
         if self.esp32_serial and self.esp32_serial.is_open:

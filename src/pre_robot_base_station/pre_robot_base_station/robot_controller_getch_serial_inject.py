@@ -6,7 +6,7 @@ import sys, termios, tty, select
 import json
 
 
-class RobotControllerGetch(Node):
+class RobotControllerGetchSerialInject(Node):
 
     def __init__(self):
         super().__init__('robot_controller_getch')
@@ -33,7 +33,7 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def input_loop(node: RobotControllerGetch):
+def input_loop(node: RobotControllerGetchSerialInject):
     print("Press keys to send commands. Press 'q' to quit.")
     while rclpy.ok():
         key = getch()
@@ -68,7 +68,7 @@ def input_loop(node: RobotControllerGetch):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = RobotControllerGetch()
+    node = RobotControllerGetchSerialInject()
 
     # Start input thread
     threading.Thread(target=input_loop, args=(node,), daemon=True).start()
