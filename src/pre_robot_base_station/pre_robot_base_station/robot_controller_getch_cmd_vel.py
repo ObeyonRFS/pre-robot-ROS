@@ -58,16 +58,16 @@ def input_loop(node: RobotControllerGetchCmdVel):
                 break
 
             elif key == 'w':
-                linear += 0.10
+                linear += 0.09/2
 
             elif key == 's':
-                linear += -0.10
+                linear += -0.09/2
 
             elif key == 'a':
-                angular += 0.05
+                angular += 0.37/3
 
             elif key == 'd':
-                angular += -0.05
+                angular += -0.37/3
 
             elif key == ' ':
                 linear = 0.0
