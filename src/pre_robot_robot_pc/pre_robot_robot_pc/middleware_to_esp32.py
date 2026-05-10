@@ -312,7 +312,7 @@ class MiddlewareNode(Node):
         # 18rpm each wheels for self rotation
         # vR = wR * r
         # w_robot = (vR-vL)/L ;where L=-18rpm, R=18rpm
-        MAX_ANGULAR = (18 * 2 * 2 * math.pi / 60 * self.wheel_radius) / self.distance_between_wheels
+        MAX_ANGULAR = ((18+18) * 2 * math.pi / 60 * self.wheel_radius) / self.distance_between_wheels
 
         v_received = twist_msg.linear.x
         omega_received = twist_msg.angular.z
