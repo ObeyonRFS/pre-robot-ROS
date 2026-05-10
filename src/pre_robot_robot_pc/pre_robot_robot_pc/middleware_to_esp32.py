@@ -313,14 +313,22 @@ class MiddlewareNode(Node):
         # w_robot = (vR-vL)/L ;where L=-18rpm, R=18rpm
         MAX_ANGULAR = (18 * 2 * math.pi / 60 * self.wheel_radius) / self.distance_between_wheels
 
-        v = twist_msg.linear.x
-        omega = twist_msg.angular.z
+        v_received = twist_msg.linear.x
+        omega_received = twist_msg.angular.z
 
         #cap a bit
-        v = max(min(v, MAX_LINEAR), -MAX_LINEAR)
-        omega = max(min(omega, MAX_ANGULAR), -MAX_ANGULAR)
+        v = max(min(v_received, MAX_LINEAR), -MAX_LINEAR)
+        omega = max(min(omega_received, MAX_ANGULAR), -MAX_ANGULAR)
+
+        if abs(v_received) > MAX_LINEAR:
+            self.get_logger().warn(f'Linear velocity {v_received:.2f} m/s exceeds max {MAX_LINEAR:.2f} m/s, capped to {v:.2f} m/s')
+
+        if abs(omega_received) > MAX_ANGULAR:
+            self.get_logger().warn(f'Angular velocity {omega_received:.2f} rad/s exceeds max {MAX_ANGULAR:.2f} rad/s, capped to {omega:.2f} rad/s')
 
         self.get_logger().info(f'cmd_vel received: linear={v:.2f} m/s, angular={omega:.2f} rad/s')
+
+        
 
         v_L = v - (omega * self.distance_between_wheels / 2.0)
         v_R = v + (omega * self.distance_between_wheels / 2.0)
