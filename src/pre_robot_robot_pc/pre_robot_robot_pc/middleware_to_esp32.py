@@ -274,6 +274,16 @@ class MiddlewareNode(Node):
             x=q[0], y=q[1], z=q[2], w=q[3]
         )
 
+        #Covariance
+        odom_msg.pose.covariance = [
+            0.01, 0, 0, 0, 0, 0,
+            0, 0.01, 0, 0, 0, 0,
+            0, 0, 99999.0, 0, 0, 0,
+            0, 0, 0, 99999.0, 0, 0,
+            0, 0, 0, 0, 99999.0, 0,
+            0, 0, 0, 0, 0, 0.05
+        ]
+
         # Velocity
         odom_msg.twist.twist.linear.x = v
         odom_msg.twist.twist.angular.z = omega

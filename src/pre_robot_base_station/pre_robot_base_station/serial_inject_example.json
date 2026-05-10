@@ -21,3 +21,6 @@
 {"command":"set_motor_PID","parameters":{"Kp":20,"Ki":3, "Kd":3}}
 
 {"command":"set_motor_PID","parameters":{"Kp":0,"Ki":0, "Kd":0}}
+
+
+{"command":"set_motor_PID","parameters":{"Kp":20,"Ki":5, "Kd":3}}
