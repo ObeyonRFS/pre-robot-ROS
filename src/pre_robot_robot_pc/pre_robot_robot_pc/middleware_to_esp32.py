@@ -305,9 +305,22 @@ class MiddlewareNode(Node):
         self.get_logger().info('Odometry reset.')
 
     def cmd_vel_callback(self, twist_msg: Twist):
+        # 24rpm each wheels for going straight
+        # w=rpm*2pi/60
+        # v=w*r
+        MAX_LINEAR = 24*2*math.pi/60*self.wheel_radius
+        # 18rpm each wheels for self rotation
+        # w_robot = (vR-vL)/L ;where L=-18rpm, R=18rpm
+        MAX_ANGULAR = (18 * 2 * math.pi / 60 * self.wheel_radius) / self.distance_between_wheels
 
         v = twist_msg.linear.x
         omega = twist_msg.angular.z
+
+        #cap a bit
+        v = max(min(v, MAX_LINEAR), -MAX_LINEAR)
+        omega = max(min(omega, MAX_ANGULAR), -MAX_ANGULAR)
+
+        self.get_logger().info(f'cmd_vel received: linear={v:.2f} m/s, angular={omega:.2f} rad/s')
 
         v_L = v - (omega * self.distance_between_wheels / 2.0)
         v_R = v + (omega * self.distance_between_wheels / 2.0)
