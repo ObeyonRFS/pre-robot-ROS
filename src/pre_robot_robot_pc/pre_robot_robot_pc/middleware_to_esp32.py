@@ -59,7 +59,7 @@ class MiddlewareNode(Node):
             10
         )
         #ros2 topic echo /pre_robot/odom_with_wheel
-        self.odom_wheel_pub = self.create_publisher(Odometry, 'pre_robot/odom_with_wheel', 10)
+        self.odom_wheel_pub = self.create_publisher(Odometry, '/odom', 10)
         #ros2 topic pub /pre_robot/reset_odom std_msgs/msg/String "{}" -1
         self.reset_odom_value_sub = self.create_subscription(
             String,
